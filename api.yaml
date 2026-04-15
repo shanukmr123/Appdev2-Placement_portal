@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: ShaanU Institutional Placement Portal API
+  description: |
+    Comprehensive API for the ShaanU Placement Portal. 
+    Supports three primary actors:
+    - *Institutional Controller (Admin)*: Governance and moderation.
+    - *Enterprise Partner (Company)*: Recruitment and talent acquisition.
+    - *Candidate (Student)*: Career tracking and applications.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5010/api/v1
+    description: Institutional Backend Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    GenericResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+
+paths:
+  # --- GATEKEEPER (AUTH) ---
+  /gatekeeper/verify-access:
+    post:
+      tags: [Gatekeeper]
+      summary: Authenticate institutional identity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        200:
+          description: Access verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+                  role: { type: string }
+                  username: { type: string }
+
+  /gatekeeper/enroll/candidate:
+    post:
+      tags: [Gatekeeper]
+      summary: Register a new student identity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, fullname, enrollment, cgpa]
+              properties:
+                email: { type: string }
+                password: { type: string }
+                fullname: { type: string }
+                enrollment: { type: string }
+                cgpa: { type: number }
+      responses:
+        201:
+          description: Student identity provisioned
+
+  # --- INSTITUTIONAL CONTROLLER (ADMIN) ---
+  /controller/dashboard/metrics:
+    get:
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      summary: Fetch global institutional metrics
+      responses:
+        200:
+          description: Metrics aggregated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  candidate_count: { type: integer }
+                  enterprise_count: { type: integer }
+                  active_drives: { type: integer }
+                  placed_students: { type: integer }
+
+  /controller/moderate/enterprises:
+    get:
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      summary: List companies awaiting verification
+      responses:
+        200:
+          description: List of pending organizations
+
+  /controller/action/enterprise/{cid}:
+    patch:
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      summary: Verify or reject a corporate partner
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [approved, rejected] }
+      responses:
+        200:
+          description: Organization status updated
+
+  /controller/moderate/drives/all:
+    get:
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      summary: View and manage all placement drives
+      responses:
+        200:
+          description: Master list of all campaigns
+
+  /controller/action/drive/{did}:
+    patch:
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      summary: Change drive status (Authorize, Close, Deny)
+      parameters:
+        - name: did
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [active, closed, rejected] }
+      responses:
+        200:
+          description: Drive lifecycle updated
+
+  # --- ENTERPRISE STRATEGIC HUB (COMPANY) ---
+  /enterprise/publish-drive:
+    post:
+      tags: [Company]
+      security: [{ BearerAuth: [] }]
+      summary: Launch a new recruitment campaign
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, package, description]
+              properties:
+                title: { type: string }
+                package: { type: string }
+                description: { type: string }
+                eligibility: { type: number }
+      responses:
+        201:
+          description: Drive submitted for approval
+
+  /enterprise/pipeline/applicants/{drive_id}:
+    get:
+      tags: [Company]
+      security: [{ BearerAuth: [] }]
+      summary: Review the recruitment pipeline for a specific drive
+      parameters:
+        - name: drive_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        200:
+          description: Candidate list with interview schedules
+
+  /enterprise/interviews/schedule:
+    post:
+      tags: [Company]
+      security: [{ BearerAuth: [] }]
+      summary: Propose an interview session to a candidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workflow_id, time, link]
+              properties:
+                workflow_id: { type: integer }
+                time: { type: string, format: date-time }
+                link: { type: string }
+      responses:
+        201:
+          description: Session dispatched
+
+  # --- CANDIDATE CAREER HUB (STUDENT) ---
+  /candidate/available-drives:
+    get:
+      tags: [Student]
+      security: [{ BearerAuth: [] }]
+      summary: Browse authorized job drives
+      responses:
+        200:
+          description: Filtered job list based on eligibility
+
+  /candidate/submit-application:
+    post:
+      tags: [Student]
+      security: [{ BearerAuth: [] }]
+      summary: Apply to a placement drive
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                drive_id: { type: integer }
+      responses:
+        201:
+          description: Application recorded
+
+  /candidate/application-tracking:
+    get:
+      tags: [Student]
+      security: [{ BearerAuth: [] }]
+      summary: Track the lifecycle of submitted applications
+      responses:
+        200:
+          description: Application history with status and interview details

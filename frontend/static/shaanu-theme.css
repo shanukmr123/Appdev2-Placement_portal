@@ -1,0 +1,114 @@
+/* ShaanU Placement Portal - Global Design System
+A responsive, modern, and accessible theme built for Institutional Excellence.
+*/
+
+:root {
+/* Color Palette */
+--shaanu-blue: #1e3c72;
+--shaanu-blue-dark: #122a52;
+--shaanu-blue-light: #2a5298;
+--shaanu-gold: #ffc107;
+--shaanu-success: #22c55e;
+--shaanu-warning: #f59e0b;
+--shaanu-danger: #ef4444;
+--shaanu-bg: #f8fafd;
+--shaanu-text-main: #1e293b;
+--shaanu-text-muted: #64748b;
+
+/* Elevation & Depth */
+--shaanu-shadow: 0 10px 30px -5px rgba(30, 60, 114, 0.08);
+--shaanu-shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+--shaanu-radius: 16px;
+--shaanu-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+background: rgba(255, 255, 255, 0.7);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Modern Typography */
+body {
+font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+color: var(--shaanu-text-main);
+background-color: var(--shaanu-bg);
+-webkit-font-smoothing: antialiased;
+line-height: 1.6;
+}
+
+/* Responsive Card Enhancements */
+.card-shaanu {
+background: white;
+border: none;
+border-radius: var(--shaanu-radius);
+box-shadow: var(--shaanu-shadow);
+transition: var(--shaanu-transition);
+overflow: hidden;
+}
+
+.card-shaanu:hover {
+transform: translateY(-4px);
+box-shadow: 0 20px 40px -10px rgba(30, 60, 114, 0.15);
+}
+
+/* Modern Buttons */
+.btn-shaanu {
+border-radius: 50px;
+padding: 0.6rem 1.5rem;
+font-weight: 600;
+letter-spacing: -0.01em;
+transition: var(--shaanu-transition);
+}
+
+.btn-shaanu-primary {
+background: linear-gradient(135deg, var(--shaanu-blue), var(--shaanu-blue-light));
+color: white;
+border: none;
+}
+
+.btn-shaanu-primary:hover {
+transform: scale(1.02);
+filter: brightness(1.1);
+box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+}
+
+/* Responsive Navigation Fixes */
+@media (max-width: 768px) {
+.navbar-nav .nav-link {
+padding: 12px 20px !important;
+border-radius: 12px;
+margin-bottom: 5px;
+}
+
+.container-fluid {
+padding-left: 15px;
+padding-right: 15px;
+}
+}
+
+/* Interactive Elements */
+.input-shaanu {
+border-radius: 12px;
+border: 1px solid #e2e8f0;
+padding: 0.75rem 1rem;
+transition: var(--shaanu-transition);
+}
+
+.input-shaanu:focus {
+border-color: var(--shaanu-blue);
+box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.1);
+outline: none;
+}
+
+/* Global Animations */
+@keyframes slideUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-entrance {
+animation: slideUp 0.6s ease-out forwards;
+}
